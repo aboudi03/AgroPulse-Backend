@@ -1,0 +1,9 @@
+C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\AgroPulseApplication.java
+C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\application\service\SensorService.java
+C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\domain\model\SensorReading.java
+C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\domain\repository\SensorRepository.java
+C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\persistence\JpaSensorRepository.java
+C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\repository\SensorRepositoryImpl.java
+C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\presentation\cli\AgroPulseApplication.java
+C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\presentation\controller\HomeController.java
+C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\presentation\controller\SensorController.java

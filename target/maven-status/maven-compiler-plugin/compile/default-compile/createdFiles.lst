@@ -1,0 +1,9 @@
+com\agropulse\presentation\cli\AgroPulseApplication.class
+com\agropulse\infrastructure\persistence\JpaSensorRepository.class
+com\agropulse\domain\repository\SensorRepository.class
+com\agropulse\AgroPulseApplication.class
+com\agropulse\presentation\controller\HomeController.class
+com\agropulse\presentation\controller\SensorController.class
+com\agropulse\application\service\SensorService.class
+com\agropulse\domain\model\SensorReading.class
+com\agropulse\infrastructure\repository\SensorRepositoryImpl.class
