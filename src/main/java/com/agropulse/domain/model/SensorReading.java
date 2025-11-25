@@ -11,6 +11,8 @@ public class SensorReading {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String deviceId;
+
     private Integer soil;
     private Double humidity;
     private Double temperature;
@@ -19,7 +21,8 @@ public class SensorReading {
 
     private LocalDateTime timestamp;
 
-    public SensorReading() {}
+    public SensorReading() {
+    }
 
     public SensorReading(Integer soil, Double humidity, Double temperature, boolean urgent) {
         this.soil = soil;
@@ -35,15 +38,23 @@ public class SensorReading {
         }
     }
 
-    public Long getId() { 
-        return id; 
+    public Long getId() {
+        return id;
     }
 
-    public Integer getSoil() {      // <-- FIXED
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public Integer getSoil() { // <-- FIXED
         return soil;
     }
 
-    public void setSoil(Integer soil) {  // <-- FIXED
+    public void setSoil(Integer soil) { // <-- FIXED
         this.soil = soil;
     }
 

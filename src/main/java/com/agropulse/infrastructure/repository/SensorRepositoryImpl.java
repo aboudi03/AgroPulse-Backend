@@ -30,4 +30,14 @@ public class SensorRepositoryImpl implements SensorRepository {
     public List<SensorReading> findAll() {
         return jpa.findAll();
     }
+
+    @Override
+    public List<SensorReading> findByDeviceId(String deviceId) {
+        return jpa.findByDeviceId(deviceId);
+    }
+
+    @Override
+    public SensorReading findLatestByDeviceId(String deviceId) {
+        return jpa.findLatestByDeviceId(deviceId);
+    }
 }

@@ -17,6 +17,10 @@ public class SensorService {
     }
 
     public SensorReading saveReading(SensorReading reading) {
+        if (reading.getDeviceId() == null || reading.getDeviceId().isEmpty()) {
+            throw new IllegalArgumentException("Device ID is required");
+        }
+
         if (reading.getTimestamp() == null) {
             reading.setTimestamp(LocalDateTime.now());
         }
@@ -43,5 +47,13 @@ public class SensorService {
 
     public List<SensorReading> getAllReadings() {
         return repository.findAll();
+    }
+
+    public SensorReading getLatestReading(String deviceId) {
+        return repository.findLatestByDeviceId(deviceId);
+    }
+
+    public List<SensorReading> getAllReadings(String deviceId) {
+        return repository.findByDeviceId(deviceId);
     }
 }

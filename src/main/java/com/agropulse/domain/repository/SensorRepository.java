@@ -10,4 +10,8 @@ public interface SensorRepository {
     SensorReading findLatest();
 
     List<SensorReading> findAll();
+
+    List<SensorReading> findByDeviceId(String deviceId);
+
+    SensorReading findLatestByDeviceId(String deviceId);
 }
