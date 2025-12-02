@@ -31,4 +31,9 @@ public class DeviceRepositoryImpl implements DeviceRepository {
     public List<Device> findAll() {
         return jpa.findAll();
     }
+
+    @Override
+    public List<Device> findByFarmId(Long farmId) {
+        return jpa.findByFarmId(farmId);
+    }
 }

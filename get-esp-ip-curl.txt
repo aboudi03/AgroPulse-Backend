@@ -1,0 +1,110 @@
+# Commands to Get ESP32 Device IP Address
+
+# ============================================
+# POWERSHELL (Windows) - Use These Commands!
+# ============================================
+
+# One-liner to get all devices with IPs:
+$login = Invoke-RestMethod -Uri "http://localhost:8080/api/auth/login" -Method POST -ContentType "application/json" -Body '{"username":"admin","password":"admin123"}'; $token = $login.token; Invoke-RestMethod -Uri "http://localhost:8080/api/admin/devices" -Method GET -Headers @{"Authorization"="Bearer $token"}
+
+# Two-step (easier to read):
+$login = Invoke-RestMethod -Uri "http://localhost:8080/api/auth/login" -Method POST -ContentType "application/json" -Body '{"username":"admin","password":"admin123"}'
+$token = $login.token
+Invoke-RestMethod -Uri "http://localhost:8080/api/admin/devices" -Method GET -Headers @{"Authorization"="Bearer $token"}
+
+# Get specific device IP:
+$devices = Invoke-RestMethod -Uri "http://localhost:8080/api/admin/devices" -Method GET -Headers @{"Authorization"="Bearer $token"}
+$devices | Where-Object { $_.deviceId -eq "ESP32-001" } | Select-Object deviceId, ip
+
+# ============================================
+# CURL (Linux/Mac/Git Bash) - Use These Commands
+# ============================================
+
+# Method 1: Get All Devices (Shows All IPs)
+# ============================================
+
+# Step 1: Login and get token
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# Save the token from response, then:
+
+# Step 2: Get all devices with IPs
+curl -X GET http://localhost:8080/api/admin/devices \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json"
+
+# Response format:
+# [
+#   {
+#     "deviceId": "ESP32-001",
+#     "ip": "192.168.1.100",  ← IP ADDRESS HERE
+#     "farmId": 1
+#   }
+# ]
+
+# ============================================
+# Method 2: Get Specific Device IP (using jq)
+# ============================================
+
+# Get token first (same as above), then:
+curl -s -X GET http://localhost:8080/api/admin/devices \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" | \
+  jq '.[] | select(.deviceId=="ESP32-001") | .ip'
+
+# ============================================
+# Method 3: One-liner (Login + Get Devices)
+# ============================================
+
+# Get token and devices in one command:
+TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}' | \
+  grep -o '"token":"[^"]*' | cut -d'"' -f4)
+
+curl -X GET http://localhost:8080/api/admin/devices \
+  -H "Authorization: Bearer $TOKEN"
+
+# ============================================
+# Method 4: Get Specific Device Details
+# ============================================
+
+# Filter for specific device ID:
+curl -s -X GET http://localhost:8080/api/admin/devices \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" | \
+  jq '.[] | select(.deviceId=="ESP32-001")'
+
+# ============================================
+# Method 5: Pretty Print All Devices
+# ============================================
+
+curl -s -X GET http://localhost:8080/api/admin/devices \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" | \
+  jq -r '.[] | "Device: \(.deviceId) | IP: \(.ip) | Farm ID: \(.farmId)"'
+
+# ============================================
+# Method 6: Check if ESP32 IP was auto-detected
+# ============================================
+
+# After ESP32 sends sensor data, check if IP was saved:
+# 1. ESP32 sends data (auto-detects IP)
+curl -X POST http://localhost:8080/api/sensor/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "deviceId": "ESP32-001",
+    "soil": 45,
+    "humidity": 60.5,
+    "temperature": 25.3
+  }'
+
+# 2. Check the IP that was saved
+TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}' | \
+  grep -o '"token":"[^"]*' | cut -d'"' -f4)
+
+curl -s -X GET http://localhost:8080/api/admin/devices \
+  -H "Authorization: Bearer $TOKEN" | \
+  jq '.[] | select(.deviceId=="ESP32-001") | {deviceId, ip, farmId}'
+

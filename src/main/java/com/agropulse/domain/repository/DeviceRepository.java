@@ -10,4 +10,6 @@ public interface DeviceRepository {
     Optional<Device> findById(String deviceId);
 
     List<Device> findAll();
+
+    List<Device> findByFarmId(Long farmId);
 }

@@ -1,0 +1,57 @@
+# CURL Commands to Test Admin API with CORS
+# Replace <TOKEN> with the JWT token from login
+
+# 1. Login as admin
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -H "Origin: http://localhost:3000" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# 2. Create a Farm (replace <TOKEN> with actual token)
+curl -X POST http://localhost:8080/api/admin/farms \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Origin: http://localhost:3000" \
+  -d '{"name":"Test Farm"}'
+
+# 3. Get all Farms
+curl -X GET http://localhost:8080/api/admin/farms \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Origin: http://localhost:3000"
+
+# 4. Create a User (replace <TOKEN> and <FARM_ID>)
+curl -X POST http://localhost:8080/api/admin/users \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Origin: http://localhost:3000" \
+  -d '{
+    "username":"testuser",
+    "password":"password123",
+    "email":"test@example.com",
+    "farmId":<FARM_ID>,
+    "role":"USER"
+  }'
+
+# 5. Get all Users
+curl -X GET http://localhost:8080/api/admin/users \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Origin: http://localhost:3000"
+
+# 6. Assign Device to Farm
+curl -X POST http://localhost:8080/api/admin/devices/assign \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Origin: http://localhost:3000" \
+  -d '{
+    "deviceId":"DEVICE-001",
+    "farmId":<FARM_ID>,
+    "ip":"192.168.1.100"
+  }'
+
+# 7. Test OPTIONS preflight request
+curl -X OPTIONS http://localhost:8080/api/admin/farms \
+  -H "Origin: http://localhost:3000" \
+  -H "Access-Control-Request-Method: POST" \
+  -H "Access-Control-Request-Headers: Content-Type,Authorization" \
+  -v
+

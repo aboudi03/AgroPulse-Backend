@@ -1,0 +1,80 @@
+# PowerShell Commands to Get ESP32 Device IP Address
+
+# ============================================
+# Method 1: Two-Step (Login, then Get Devices)
+# ============================================
+
+# Step 1: Login and get token
+$login = Invoke-RestMethod -Uri "http://localhost:8080/api/auth/login" `
+    -Method POST `
+    -ContentType "application/json" `
+    -Body '{"username":"admin","password":"admin123"}'
+
+$token = $login.token
+
+# Step 2: Get all devices with IPs
+$devices = Invoke-RestMethod -Uri "http://localhost:8080/api/admin/devices" `
+    -Method GET `
+    -Headers @{"Authorization"="Bearer $token"}
+
+# Display devices
+$devices | ForEach-Object {
+    Write-Host "Device: $($_.deviceId) | IP: $($_.ip) | Farm: $($_.farmId)"
+}
+
+# ============================================
+# Method 2: One-Liner (All in One)
+# ============================================
+
+$login = Invoke-RestMethod -Uri "http://localhost:8080/api/auth/login" -Method POST -ContentType "application/json" -Body '{"username":"admin","password":"admin123"}'; $token = $login.token; Invoke-RestMethod -Uri "http://localhost:8080/api/admin/devices" -Method GET -Headers @{"Authorization"="Bearer $token"}
+
+# ============================================
+# Method 3: Get Specific Device IP
+# ============================================
+
+# Get all devices first
+$login = Invoke-RestMethod -Uri "http://localhost:8080/api/auth/login" -Method POST -ContentType "application/json" -Body '{"username":"admin","password":"admin123"}'
+$token = $login.token
+$devices = Invoke-RestMethod -Uri "http://localhost:8080/api/admin/devices" -Method GET -Headers @{"Authorization"="Bearer $token"}
+
+# Filter for specific device
+$device = $devices | Where-Object { $_.deviceId -eq "ESP32-001" }
+Write-Host "Device IP: $($device.ip)"
+
+# ============================================
+# Method 4: Pretty Format Output
+# ============================================
+
+$login = Invoke-RestMethod -Uri "http://localhost:8080/api/auth/login" -Method POST -ContentType "application/json" -Body '{"username":"admin","password":"admin123"}'
+$token = $login.token
+$devices = Invoke-RestMethod -Uri "http://localhost:8080/api/admin/devices" -Method GET -Headers @{"Authorization"="Bearer $token"}
+
+$devices | Format-Table deviceId, ip, farmId -AutoSize
+
+# ============================================
+# Method 5: Export to JSON
+# ============================================
+
+$login = Invoke-RestMethod -Uri "http://localhost:8080/api/auth/login" -Method POST -ContentType "application/json" -Body '{"username":"admin","password":"admin123"}'
+$token = $login.token
+$devices = Invoke-RestMethod -Uri "http://localhost:8080/api/admin/devices" -Method GET -Headers @{"Authorization"="Bearer $token"}
+
+$devices | ConvertTo-Json
+
+# ============================================
+# Method 6: Check After ESP32 Sends Data
+# ============================================
+
+# 1. ESP32 sends sensor data (auto-detects IP)
+Invoke-RestMethod -Uri "http://localhost:8080/api/sensor/add" `
+    -Method POST `
+    -ContentType "application/json" `
+    -Body '{"deviceId":"ESP32-001","soil":45,"humidity":60.5,"temperature":25.3}'
+
+# 2. Check the IP that was saved
+$login = Invoke-RestMethod -Uri "http://localhost:8080/api/auth/login" -Method POST -ContentType "application/json" -Body '{"username":"admin","password":"admin123"}'
+$token = $login.token
+$devices = Invoke-RestMethod -Uri "http://localhost:8080/api/admin/devices" -Method GET -Headers @{"Authorization"="Bearer $token"}
+$device = $devices | Where-Object { $_.deviceId -eq "ESP32-001" }
+Write-Host "ESP32 IP: $($device.ip)"
+

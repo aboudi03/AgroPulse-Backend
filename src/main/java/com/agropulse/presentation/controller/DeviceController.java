@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/device")
-@CrossOrigin(origins = "*")
 public class DeviceController {
 
     private final DeviceRepository deviceRepository;
@@ -48,8 +47,14 @@ public class DeviceController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DeviceDTO>> getAllDevices() {
-        List<Device> devices = deviceRepository.findAll();
+    public ResponseEntity<List<DeviceDTO>> getAllDevices(jakarta.servlet.http.HttpServletRequest request) {
+        Long farmId = (Long) request.getAttribute("farmId");
+
+        if (farmId == null) {
+            return ResponseEntity.status(403).build();
+        }
+
+        List<Device> devices = deviceRepository.findByFarmId(farmId);
         List<DeviceDTO> deviceDTOs = devices.stream()
                 .map(device -> new DeviceDTO(device.getDeviceId(), device.getIpAddress()))
                 .toList();

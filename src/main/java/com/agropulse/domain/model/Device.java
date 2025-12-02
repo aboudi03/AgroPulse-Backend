@@ -12,9 +12,13 @@ public class Device {
 
     private String ipAddress;
 
+    @Column(name = "farm_id")
+    private Long farmId;
+
     private LocalDateTime lastSeen;
 
     public Device() {
+        this.lastSeen = LocalDateTime.now();
     }
 
     public Device(String deviceId, String ipAddress) {
@@ -51,5 +55,13 @@ public class Device {
 
     public void setLastSeen(LocalDateTime lastSeen) {
         this.lastSeen = lastSeen;
+    }
+
+    public Long getFarmId() {
+        return farmId;
+    }
+
+    public void setFarmId(Long farmId) {
+        this.farmId = farmId;
     }
 }

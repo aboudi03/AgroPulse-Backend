@@ -1,0 +1,83 @@
+# CURL Commands to Test Device IP Tracking
+# Replace <TOKEN> with JWT token from login
+
+# ============================================
+# 1. Login as Admin
+# ============================================
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# Save the token from response (e.g., TOKEN="eyJhbGc...")
+
+# ============================================
+# 2. Assign Device to Farm (IP optional)
+# ============================================
+curl -X POST http://localhost:8080/api/admin/devices/assign \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "deviceId": "ESP32-TEST-001",
+    "farmId": 1
+  }'
+
+# ============================================
+# 3. Simulate ESP32 Sending Sensor Data
+# This automatically detects and saves the IP!
+# ============================================
+curl -X POST http://localhost:8080/api/sensor/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "deviceId": "ESP32-TEST-001",
+    "soil": 45,
+    "humidity": 60.5,
+    "temperature": 25.3
+  }'
+
+# ============================================
+# 4. Get All Devices (Admin) - Shows IP Address
+# ============================================
+curl -X GET http://localhost:8080/api/admin/devices \
+  -H "Authorization: Bearer <TOKEN>"
+
+# Response format:
+# [
+#   {
+#     "deviceId": "ESP32-TEST-001",
+#     "ip": "192.168.1.100",  <-- IP ADDRESS HERE
+#     "farmId": 1
+#   }
+# ]
+
+# ============================================
+# 5. Get Devices for User's Farm (User endpoint)
+# ============================================
+# First login as a regular user, then:
+curl -X GET http://localhost:8080/api/device \
+  -H "Authorization: Bearer <USER_TOKEN>"
+
+# Response format:
+# [
+#   {
+#     "deviceId": "ESP32-TEST-001",
+#     "ip": "192.168.1.100"  <-- IP ADDRESS HERE
+#   }
+# ]
+
+# ============================================
+# 6. Check Device IP After Multiple Requests
+# ============================================
+# Send sensor data again (simulates ESP32 with new IP)
+curl -X POST http://localhost:8080/api/sensor/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "deviceId": "ESP32-TEST-001",
+    "soil": 50,
+    "humidity": 65.0,
+    "temperature": 22.5
+  }'
+
+# Check if IP was updated
+curl -X GET http://localhost:8080/api/admin/devices \
+  -H "Authorization: Bearer <TOKEN>"
+
