@@ -142,47 +142,6 @@ public class AdminController {
         }
     }
 
-    @PutMapping("/users/{userId}/farm")
-    public ResponseEntity<Map<String, Object>> updateUserFarm(@PathVariable String userId,
-            @RequestBody UpdateUserFarmRequest request) {
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
-            // Convert farmId from number to string (frontend sends number, backend stores as string)
-            String farmId = request.getFarmId() != null ? String.valueOf(request.getFarmId()) : null;
-
-            // Validate farm exists if farmId is provided
-            if (farmId != null && !farmId.isEmpty()) {
-                if (!farmRepository.existsById(farmId)) {
-                    response.put("error", "Farm not found");
-                    return ResponseEntity.badRequest().body(response);
-                }
-                user.setFarmId(farmId);
-            } else {
-                // Allow setting farmId to null (unassign from farm)
-                user.setFarmId(null);
-            }
-
-            userRepository.save(user);
-
-            response.put("message", "User farm updated successfully");
-            response.put("userId", user.getId());
-            response.put("username", user.getUsername());
-            response.put("farmId", user.getFarmId());
-
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            response.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
-        } catch (Exception e) {
-            response.put("error", "An error occurred: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
-        }
-    }
-
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Map<String, String>> deleteUser(@PathVariable String userId) {
         if (!userRepository.existsById(userId)) {
@@ -409,18 +368,6 @@ public class AdminController {
 
         public void setRole(String role) {
             this.role = role;
-        }
-    }
-
-    public static class UpdateUserFarmRequest {
-        private Integer farmId; // Frontend sends as number
-
-        public Integer getFarmId() {
-            return farmId;
-        }
-
-        public void setFarmId(Integer farmId) {
-            this.farmId = farmId;
         }
     }
 
