@@ -2,6 +2,7 @@ package com.agropulse.presentation.controller;
 
 import com.agropulse.domain.model.Device;
 import com.agropulse.domain.repository.DeviceRepository;
+import com.agropulse.infrastructure.util.IpAddressUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +20,15 @@ public class DeviceController {
         this.deviceRepository = deviceRepository;
     }
 
+    /**
+     * Register a new ESP32 device.
+     * IP address is optional - it will be automatically detected from the HTTP request if not provided.
+     * This allows ESP32 to use DHCP - no static IP configuration needed!
+     */
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> registerDevice(@RequestBody DeviceRegistrationRequest request) {
+    public ResponseEntity<Map<String, String>> registerDevice(
+            @RequestBody DeviceRegistrationRequest request,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
         Map<String, String> response = new HashMap<>();
 
         if (request.getDeviceId() == null || request.getDeviceId().isEmpty()) {
@@ -28,15 +36,23 @@ public class DeviceController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        if (request.getIp() == null || request.getIp().isEmpty()) {
-            response.put("error", "ip is required");
-            return ResponseEntity.badRequest().body(response);
+        // Auto-detect IP from request if not provided
+        String ipAddress = request.getIp();
+        if (ipAddress == null || ipAddress.isEmpty()) {
+            ipAddress = IpAddressUtil.getClientIpAddress(httpRequest);
         }
 
+        boolean isNewDevice = !deviceRepository.existsById(request.getDeviceId());
         Device device = deviceRepository.findById(request.getDeviceId())
-                .orElse(new Device(request.getDeviceId(), request.getIp()));
+                .orElse(new Device(request.getDeviceId(), ipAddress));
 
-        device.setIpAddress(request.getIp());
+        // Update IP address (in case it changed)
+        device.setIpAddress(ipAddress);
+        // For new devices, ensure farmId is null - devices should be assigned manually via admin panel
+        // For existing devices, preserve the current farmId (don't overwrite it)
+        if (isNewDevice) {
+            device.setFarmId(null);
+        }
         deviceRepository.save(device);
 
         response.put("message", "Device registered successfully");
@@ -48,7 +64,7 @@ public class DeviceController {
 
     @GetMapping
     public ResponseEntity<List<DeviceDTO>> getAllDevices(jakarta.servlet.http.HttpServletRequest request) {
-        Long farmId = (Long) request.getAttribute("farmId");
+        String farmId = (String) request.getAttribute("farmId");
 
         if (farmId == null) {
             return ResponseEntity.status(403).build();

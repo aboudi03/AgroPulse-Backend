@@ -1,36 +1,34 @@
 package com.agropulse.domain.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.index.Indexed;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "users")
+@Document(collection = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(unique = true, nullable = false)
+    @Indexed(unique = true)
     private String username;
 
-    @Column(nullable = false)
     private String password; // BCrypt hashed
 
     private String email;
 
-    @Column(name = "farm_id")
-    private Long farmId;
+    private String farmId;
 
-    @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
     private LocalDateTime createdAt;
 
     public User() {
+        this.createdAt = LocalDateTime.now();
     }
 
-    public User(String username, String password, String email, Long farmId, Role role) {
+    public User(String username, String password, String email, String farmId, Role role) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -39,18 +37,11 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
-    @PrePersist
-    public void setCreatedAtOnCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-    }
-
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -78,11 +69,11 @@ public class User {
         this.email = email;
     }
 
-    public Long getFarmId() {
+    public String getFarmId() {
         return farmId;
     }
 
-    public void setFarmId(Long farmId) {
+    public void setFarmId(String farmId) {
         this.farmId = farmId;
     }
 

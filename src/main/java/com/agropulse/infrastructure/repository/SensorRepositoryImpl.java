@@ -2,7 +2,7 @@ package com.agropulse.infrastructure.repository;
 
 import com.agropulse.domain.model.SensorReading;
 import com.agropulse.domain.repository.SensorRepository;
-import com.agropulse.infrastructure.persistence.JpaSensorRepository;
+import com.agropulse.infrastructure.persistence.MongoSensorRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,34 +10,34 @@ import java.util.List;
 @Repository
 public class SensorRepositoryImpl implements SensorRepository {
 
-    private final JpaSensorRepository jpa;
+    private final MongoSensorRepository mongo;
 
-    public SensorRepositoryImpl(JpaSensorRepository jpa) {
-        this.jpa = jpa;
+    public SensorRepositoryImpl(MongoSensorRepository mongo) {
+        this.mongo = mongo;
     }
 
     @Override
     public SensorReading save(SensorReading reading) {
-        return jpa.save(reading);
+        return mongo.save(reading);
     }
 
     @Override
     public SensorReading findLatest() {
-        return jpa.findLatest();
+        return mongo.findTopByOrderByTimestampDesc();
     }
 
     @Override
     public List<SensorReading> findAll() {
-        return jpa.findAll();
+        return mongo.findAll();
     }
 
     @Override
     public List<SensorReading> findByDeviceId(String deviceId) {
-        return jpa.findByDeviceId(deviceId);
+        return mongo.findByDeviceIdOrderByTimestampDesc(deviceId);
     }
 
     @Override
     public SensorReading findLatestByDeviceId(String deviceId) {
-        return jpa.findLatestByDeviceId(deviceId);
+        return mongo.findTopByDeviceIdOrderByTimestampDesc(deviceId);
     }
 }

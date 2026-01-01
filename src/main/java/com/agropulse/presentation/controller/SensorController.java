@@ -83,6 +83,10 @@ public class SensorController {
             
             // Update IP address (in case it changed due to DHCP renewal)
             device.setIpAddress(clientIp);
+            // Do NOT set farmId here - devices should be assigned manually via admin panel
+            // Only update farmId if device already has one (preserve existing assignment)
+            // If device is new, farmId will remain null
+            
             // lastSeen is automatically updated by @PreUpdate in Device entity
             
             deviceRepository.save(device);

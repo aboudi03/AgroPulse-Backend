@@ -5,7 +5,7 @@ import com.agropulse.domain.model.Farm;
 import com.agropulse.domain.model.User;
 import com.agropulse.domain.repository.FarmRepository;
 import com.agropulse.domain.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -16,14 +16,10 @@ public class DataInitializer implements CommandLineRunner {
     private final FarmRepository farmRepository;
     private final UserRepository userRepository;
 
-    @Value("${app.admin.username}")
-    private String adminUsername;
-
-    @Value("${app.admin.password}")
-    private String adminPassword;
-
-    @Value("${app.admin.email}")
-    private String adminEmail;
+    // Hardcoded Super Admin Credentials
+    private final String adminUsername = "admin";
+    private final String adminPassword = "admin123";
+    private final String adminEmail = "admin@agropulse.com";
 
     public DataInitializer(AuthService authService, FarmRepository farmRepository, UserRepository userRepository) {
         this.authService = authService;
@@ -61,7 +57,10 @@ public class DataInitializer implements CommandLineRunner {
                 // local
                 System.out.println("Password: " + adminPassword);
             } else {
-                System.out.println("Super Admin already exists.");
+                System.out
+                        .println("Super Admin already exists. Updating password to ensure it matches configuration...");
+                authService.updatePassword(adminUsername, adminPassword);
+                System.out.println("Super Admin password updated.");
             }
         } catch (Exception e) {
             System.err.println("Error initializing data: " + e.getMessage());

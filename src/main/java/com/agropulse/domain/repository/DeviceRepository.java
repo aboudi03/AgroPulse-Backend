@@ -11,5 +11,9 @@ public interface DeviceRepository {
 
     List<Device> findAll();
 
-    List<Device> findByFarmId(Long farmId);
+    List<Device> findByFarmId(String farmId);
+
+    void deleteById(String id);
+
+    boolean existsById(String id);
 }

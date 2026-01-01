@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (jwtUtil.validateToken(token)) {
                 String username = jwtUtil.extractUsername(token);
-                Long farmId = jwtUtil.extractFarmId(token);
+                String farmId = jwtUtil.extractFarmId(token);
                 String role = jwtUtil.extractRole(token);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -60,6 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return path.startsWith("/api/auth/") ||
                 path.equals("/") ||
                 path.startsWith("/h2-console/") ||
-                path.equals("/api/sensor/add");
+                path.equals("/api/sensor/add") ||
+                path.startsWith("/api/device/"); // Skip JWT filter for all device endpoints
     }
 }

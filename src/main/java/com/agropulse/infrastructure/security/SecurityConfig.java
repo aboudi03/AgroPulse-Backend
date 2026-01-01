@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/sensor/add").permitAll()
+                        .requestMatchers("/api/device/**").permitAll() // Allow all device endpoints for ESP32 registration
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

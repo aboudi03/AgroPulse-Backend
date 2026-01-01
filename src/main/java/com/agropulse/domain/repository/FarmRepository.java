@@ -7,7 +7,11 @@ import java.util.Optional;
 public interface FarmRepository {
     Farm save(Farm farm);
 
-    Optional<Farm> findById(Long id);
+    Optional<Farm> findById(String id);
 
     List<Farm> findAll();
+
+    void deleteById(String id);
+
+    boolean existsById(String id);
 }

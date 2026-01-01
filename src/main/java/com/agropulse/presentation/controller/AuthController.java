@@ -65,7 +65,7 @@ public class AuthController {
         private String username;
         private String password;
         private String email;
-        private Long farmId;
+        private String farmId;
         private String role;
 
         public String getUsername() {
@@ -92,11 +92,11 @@ public class AuthController {
             this.email = email;
         }
 
-        public Long getFarmId() {
+        public String getFarmId() {
             return farmId;
         }
 
-        public void setFarmId(Long farmId) {
+        public void setFarmId(String farmId) {
             this.farmId = farmId;
         }
 

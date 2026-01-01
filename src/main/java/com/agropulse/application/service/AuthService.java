@@ -24,7 +24,7 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public User register(String username, String password, String email, Long farmId, User.Role role) {
+    public User register(String username, String password, String email, String farmId, User.Role role) {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new RuntimeException("Username already exists");
         }
@@ -52,5 +52,11 @@ public class AuthService {
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public void updatePassword(String username, String newPassword) {
+        User user = getUserByUsername(username);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }

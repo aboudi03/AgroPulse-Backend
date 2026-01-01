@@ -59,6 +59,18 @@ public class AdminController {
         return ResponseEntity.ok(farmDTOs);
     }
 
+    @DeleteMapping("/farms/{farmId}")
+    public ResponseEntity<Map<String, String>> deleteFarm(@PathVariable String farmId) {
+        if (!farmRepository.existsById(farmId)) {
+            return ResponseEntity.notFound().build();
+        }
+        farmRepository.deleteById(farmId);
+        // Optional: Also delete or unassign users/devices associated with this farm
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Farm deleted successfully");
+        return ResponseEntity.ok(response);
+    }
+
     // ==================== USER MANAGEMENT ====================
 
     @PostMapping("/users")
@@ -95,7 +107,7 @@ public class AdminController {
     }
 
     @PutMapping("/users/{userId}")
-    public ResponseEntity<Map<String, Object>> updateUser(@PathVariable Long userId,
+    public ResponseEntity<Map<String, Object>> updateUser(@PathVariable String userId,
             @RequestBody UpdateUserRequest request) {
         Map<String, Object> response = new HashMap<>();
 
@@ -130,6 +142,58 @@ public class AdminController {
         }
     }
 
+    @PutMapping("/users/{userId}/farm")
+    public ResponseEntity<Map<String, Object>> updateUserFarm(@PathVariable String userId,
+            @RequestBody UpdateUserFarmRequest request) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Convert farmId from number to string (frontend sends number, backend stores as string)
+            String farmId = request.getFarmId() != null ? String.valueOf(request.getFarmId()) : null;
+
+            // Validate farm exists if farmId is provided
+            if (farmId != null && !farmId.isEmpty()) {
+                if (!farmRepository.existsById(farmId)) {
+                    response.put("error", "Farm not found");
+                    return ResponseEntity.badRequest().body(response);
+                }
+                user.setFarmId(farmId);
+            } else {
+                // Allow setting farmId to null (unassign from farm)
+                user.setFarmId(null);
+            }
+
+            userRepository.save(user);
+
+            response.put("message", "User farm updated successfully");
+            response.put("userId", user.getId());
+            response.put("username", user.getUsername());
+            response.put("farmId", user.getFarmId());
+
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            response.put("error", "An error occurred: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable String userId) {
+        if (!userRepository.existsById(userId)) {
+            return ResponseEntity.notFound().build();
+        }
+        userRepository.deleteById(userId);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "User deleted successfully");
+        return ResponseEntity.ok(response);
+    }
+
     // ==================== DEVICE MANAGEMENT ====================
 
     /**
@@ -159,7 +223,7 @@ public class AdminController {
 
         response.put("message", "Device assigned to farm successfully");
         response.put("deviceId", device.getDeviceId());
-        response.put("farmId", device.getFarmId().toString());
+        response.put("farmId", device.getFarmId());
         if (device.getIpAddress() != null) {
             response.put("ipAddress", device.getIpAddress());
         } else {
@@ -176,6 +240,57 @@ public class AdminController {
                 .map(d -> new DeviceDTO(d.getDeviceId(), d.getIpAddress(), d.getFarmId()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(deviceDTOs);
+    }
+
+    @PutMapping("/devices/{deviceId}")
+    public ResponseEntity<Map<String, Object>> updateDevice(@PathVariable String deviceId,
+            @RequestBody UpdateDeviceRequest request) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Device device = deviceRepository.findById(deviceId)
+                    .orElseThrow(() -> new RuntimeException("Device not found"));
+
+            // Validate farm exists if farmId is being updated
+            if (request.getFarmId() != null && !request.getFarmId().isEmpty()) {
+                if (!farmRepository.existsById(request.getFarmId())) {
+                    response.put("error", "Farm not found");
+                    return ResponseEntity.badRequest().body(response);
+                }
+                device.setFarmId(request.getFarmId());
+            }
+
+            // Update IP address if provided
+            if (request.getIp() != null && !request.getIp().isEmpty()) {
+                device.setIpAddress(request.getIp());
+            }
+
+            deviceRepository.save(device);
+
+            response.put("message", "Device updated successfully");
+            response.put("deviceId", device.getDeviceId());
+            response.put("farmId", device.getFarmId());
+            response.put("ipAddress", device.getIpAddress());
+
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            response.put("error", "An error occurred: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @DeleteMapping("/devices/{deviceId}")
+    public ResponseEntity<Map<String, String>> deleteDevice(@PathVariable String deviceId) {
+        if (!deviceRepository.existsById(deviceId)) {
+            return ResponseEntity.notFound().build();
+        }
+        deviceRepository.deleteById(deviceId);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Device deleted successfully");
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -223,7 +338,7 @@ public class AdminController {
         private String username;
         private String password;
         private String email;
-        private Long farmId;
+        private String farmId;
         private String role;
 
         public String getUsername() {
@@ -250,11 +365,11 @@ public class AdminController {
             this.email = email;
         }
 
-        public Long getFarmId() {
+        public String getFarmId() {
             return farmId;
         }
 
-        public void setFarmId(Long farmId) {
+        public void setFarmId(String farmId) {
             this.farmId = farmId;
         }
 
@@ -269,7 +384,7 @@ public class AdminController {
 
     public static class UpdateUserRequest {
         private String email;
-        private Long farmId;
+        private String farmId;
         private String role;
 
         public String getEmail() {
@@ -280,11 +395,11 @@ public class AdminController {
             this.email = email;
         }
 
-        public Long getFarmId() {
+        public String getFarmId() {
             return farmId;
         }
 
-        public void setFarmId(Long farmId) {
+        public void setFarmId(String farmId) {
             this.farmId = farmId;
         }
 
@@ -297,9 +412,21 @@ public class AdminController {
         }
     }
 
+    public static class UpdateUserFarmRequest {
+        private Integer farmId; // Frontend sends as number
+
+        public Integer getFarmId() {
+            return farmId;
+        }
+
+        public void setFarmId(Integer farmId) {
+            this.farmId = farmId;
+        }
+    }
+
     public static class AssignDeviceRequest {
         private String deviceId;
-        private Long farmId;
+        private String farmId;
         private String ip;
 
         public String getDeviceId() {
@@ -310,11 +437,32 @@ public class AdminController {
             this.deviceId = deviceId;
         }
 
-        public Long getFarmId() {
+        public String getFarmId() {
             return farmId;
         }
 
-        public void setFarmId(Long farmId) {
+        public void setFarmId(String farmId) {
+            this.farmId = farmId;
+        }
+
+        public String getIp() {
+            return ip;
+        }
+
+        public void setIp(String ip) {
+            this.ip = ip;
+        }
+    }
+
+    public static class UpdateDeviceRequest {
+        private String farmId;
+        private String ip;
+
+        public String getFarmId() {
+            return farmId;
+        }
+
+        public void setFarmId(String farmId) {
             this.farmId = farmId;
         }
 
@@ -328,17 +476,17 @@ public class AdminController {
     }
 
     public static class FarmDTO {
-        private Long id;
+        private String id;
         private String name;
         private String createdAt;
 
-        public FarmDTO(Long id, String name, String createdAt) {
+        public FarmDTO(String id, String name, String createdAt) {
             this.id = id;
             this.name = name;
             this.createdAt = createdAt;
         }
 
-        public Long getId() {
+        public String getId() {
             return id;
         }
 
@@ -352,13 +500,13 @@ public class AdminController {
     }
 
     public static class UserDTO {
-        private Long id;
+        private String id;
         private String username;
         private String email;
-        private Long farmId;
+        private String farmId;
         private String role;
 
-        public UserDTO(Long id, String username, String email, Long farmId, String role) {
+        public UserDTO(String id, String username, String email, String farmId, String role) {
             this.id = id;
             this.username = username;
             this.email = email;
@@ -366,7 +514,7 @@ public class AdminController {
             this.role = role;
         }
 
-        public Long getId() {
+        public String getId() {
             return id;
         }
 
@@ -378,7 +526,7 @@ public class AdminController {
             return email;
         }
 
-        public Long getFarmId() {
+        public String getFarmId() {
             return farmId;
         }
 
@@ -390,9 +538,9 @@ public class AdminController {
     public static class DeviceDTO {
         private String deviceId;
         private String ip;
-        private Long farmId;
+        private String farmId;
 
-        public DeviceDTO(String deviceId, String ip, Long farmId) {
+        public DeviceDTO(String deviceId, String ip, String farmId) {
             this.deviceId = deviceId;
             this.ip = ip;
             this.farmId = farmId;
@@ -406,7 +554,7 @@ public class AdminController {
             return ip;
         }
 
-        public Long getFarmId() {
+        public String getFarmId() {
             return farmId;
         }
     }
@@ -420,9 +568,9 @@ public class AdminController {
         private String ipAddress;
         private String macAddress; // Optional, may be null
         private boolean registered;
-        private Long farmId; // null if not registered
+        private String farmId; // null if not registered
 
-        public ScannedEspDto(String deviceId, String ipAddress, String macAddress, boolean registered, Long farmId) {
+        public ScannedEspDto(String deviceId, String ipAddress, String macAddress, boolean registered, String farmId) {
             this.deviceId = deviceId;
             this.ipAddress = ipAddress;
             this.macAddress = macAddress;
@@ -462,11 +610,11 @@ public class AdminController {
             this.registered = registered;
         }
 
-        public Long getFarmId() {
+        public String getFarmId() {
             return farmId;
         }
 
-        public void setFarmId(Long farmId) {
+        public void setFarmId(String farmId) {
             this.farmId = farmId;
         }
     }

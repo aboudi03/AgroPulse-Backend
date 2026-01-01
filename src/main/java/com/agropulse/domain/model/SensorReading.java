@@ -1,15 +1,14 @@
 package com.agropulse.domain.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "sensor_readings")
+@Document(collection = "sensor_readings")
 public class SensorReading {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     private String deviceId;
 
@@ -22,6 +21,7 @@ public class SensorReading {
     private LocalDateTime timestamp;
 
     public SensorReading() {
+        this.timestamp = LocalDateTime.now();
     }
 
     public SensorReading(Integer soil, Double humidity, Double temperature, boolean urgent) {
@@ -29,16 +29,10 @@ public class SensorReading {
         this.humidity = humidity;
         this.temperature = temperature;
         this.urgent = urgent;
+        this.timestamp = LocalDateTime.now();
     }
 
-    @PrePersist
-    public void setTimestampOnCreate() {
-        if (timestamp == null) {
-            timestamp = LocalDateTime.now();
-        }
-    }
-
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

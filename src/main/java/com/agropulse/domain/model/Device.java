@@ -1,10 +1,10 @@
 package com.agropulse.domain.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "devices")
+@Document(collection = "devices")
 public class Device {
 
     @Id
@@ -12,8 +12,9 @@ public class Device {
 
     private String ipAddress;
 
-    @Column(name = "farm_id")
-    private Long farmId;
+    private String farmId;
+
+    private String userId;
 
     private LocalDateTime lastSeen;
 
@@ -24,12 +25,6 @@ public class Device {
     public Device(String deviceId, String ipAddress) {
         this.deviceId = deviceId;
         this.ipAddress = ipAddress;
-        this.lastSeen = LocalDateTime.now();
-    }
-
-    @PrePersist
-    @PreUpdate
-    public void updateLastSeen() {
         this.lastSeen = LocalDateTime.now();
     }
 
@@ -57,11 +52,19 @@ public class Device {
         this.lastSeen = lastSeen;
     }
 
-    public Long getFarmId() {
+    public String getFarmId() {
         return farmId;
     }
 
-    public void setFarmId(Long farmId) {
+    public void setFarmId(String farmId) {
         this.farmId = farmId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }
