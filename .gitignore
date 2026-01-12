@@ -38,7 +38,7 @@ agropulse.trace.db
 application.properties
 application-local.properties
 application-dev.properties
-application-prod.properties
+# application-prod.properties
 
 ### Spring Boot ###
 /build/
