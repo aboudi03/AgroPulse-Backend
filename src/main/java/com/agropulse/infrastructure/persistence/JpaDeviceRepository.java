@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface JpaDeviceRepository extends MongoRepository<Device, String> {
     List<Device> findByFarmId(Long farmId);
+
+    List<Device> findByFarmIdIsNull();
 }

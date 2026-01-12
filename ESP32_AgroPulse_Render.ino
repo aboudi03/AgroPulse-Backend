@@ -172,6 +172,7 @@ void checkSerialCommands() {
 // =======================================================
 // 🔥 Trigger HTTP Endpoint (/trigger)
 // =======================================================
+void handleTrigger() {
   Serial.println("🔥 HTTP trigger received!");
   server.sendHeader("Connection", "close"); // Force browser to close connection
   server.send(200, "text/plain", "Triggered! Data is being sent...");

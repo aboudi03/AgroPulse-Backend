@@ -55,6 +55,10 @@ public class DeviceController {
         }
 
         List<Device> devices = deviceRepository.findByFarmId(farmId);
+        // Also include unassigned devices so they can be discovered
+        List<Device> unassigned = deviceRepository.findByFarmIdIsNull();
+        devices.addAll(unassigned);
+
         List<DeviceDTO> deviceDTOs = devices.stream()
                 .map(device -> new DeviceDTO(device.getDeviceId(), device.getIpAddress()))
                 .toList();

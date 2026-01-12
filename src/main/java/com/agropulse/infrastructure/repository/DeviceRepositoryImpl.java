@@ -36,4 +36,9 @@ public class DeviceRepositoryImpl implements DeviceRepository {
     public List<Device> findByFarmId(Long farmId) {
         return jpa.findByFarmId(farmId);
     }
+
+    @Override
+    public List<Device> findByFarmIdIsNull() {
+        return jpa.findByFarmIdIsNull();
+    }
 }

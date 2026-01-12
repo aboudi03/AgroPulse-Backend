@@ -12,4 +12,6 @@ public interface DeviceRepository {
     List<Device> findAll();
 
     List<Device> findByFarmId(Long farmId);
+
+    List<Device> findByFarmIdIsNull();
 }
