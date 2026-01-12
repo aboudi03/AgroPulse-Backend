@@ -1,4 +1,4 @@
-# AgroPulse API Test Script - COMPLETE DEVICE TEST
+# AgroPulse API Test Script - DEVICE TEST
 # Run this after starting the server with: mvn spring-boot:run
 
 Write-Host "=== 🌱 AgroPulse API - Device Test Sequence ===" -ForegroundColor Cyan
@@ -74,34 +74,37 @@ try {
             Write-Host "      Farm ID: $($device.farmId)" -ForegroundColor Gray
         }
     } else {
-        Write-Host "  ⚠ No devices found - this is the problem!" -ForegroundColor Yellow
+        Write-Host "  ⚠ No devices found - devices list is empty!" -ForegroundColor Yellow
     }
 } catch {
     Write-Host "✗ FAILED: $($_.Exception.Message)" -ForegroundColor Red
 }
 Write-Host ""
 
-# Test 3: Register
-Write-Host "[TEST 3] Testing register endpoint..." -ForegroundColor Yellow
+# ============================================
+# STEP 4: GET ALL SENSOR READINGS
+# ============================================
+Write-Host "[STEP 4] 📊 Checking sensor readings..." -ForegroundColor Yellow
 try {
-    $body = @{
-        username = "testuser"
-        password = "test123"
-        email = "test@test.com"
-        farmId = 1
-    } | ConvertTo-Json
+    $headers = @{ Authorization = "Bearer $token" }
+    $readingsResponse = Invoke-WebRequest -Uri "http://localhost:8080/api/sensor/all" `
+        -Method GET `
+        -Headers $headers
     
-    $response = Invoke-WebRequest -Uri "http://localhost:8080/api/auth/register" `
-        -Method POST `
-        -ContentType "application/json" `
-        -Body $body
+    $readings = $readingsResponse.Content | ConvertFrom-Json
+    Write-Host "✓ READINGS RETRIEVED - Total: $($readings.Count)" -ForegroundColor Green
     
-    Write-Host "✓ SUCCESS: Status $($response.StatusCode)" -ForegroundColor Green
-    Write-Host "  Response: $($response.Content)" -ForegroundColor Gray
+    if ($readings.Count -gt 0) {
+        Write-Host "  Latest reading:" -ForegroundColor Green
+        $latest = $readings[0]
+        Write-Host "    Device: $($latest.deviceId)" -ForegroundColor Gray
+        Write-Host "    Soil: $($latest.soil)%" -ForegroundColor Gray
+        Write-Host "    Humidity: $($latest.humidity)%" -ForegroundColor Gray
+        Write-Host "    Temperature: $($latest.temperature)°C" -ForegroundColor Gray
+    }
 } catch {
-    Write-Host "✗ FAILED: Status $($_.Exception.Response.StatusCode.value__)" -ForegroundColor Red
-    Write-Host "  Error: $($_.ErrorDetails.Message)" -ForegroundColor Red
+    Write-Host "✗ FAILED: $($_.Exception.Message)" -ForegroundColor Red
 }
 Write-Host ""
 
-Write-Host "=== Tests Complete ===" -ForegroundColor Cyan
+Write-Host "=== ✓ Test Complete ===" -ForegroundColor Cyan
