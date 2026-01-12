@@ -1,0 +1,33 @@
+# AgroPulse Application Configuration Template
+# Copy this file to src/main/resources/application.properties and fill in your actual values
+
+server.port=8080
+server.address=0.0.0.0
+
+# ===== DATABASE CONFIGURATION =====
+# MongoDB Atlas - Cloud Database
+# Collections: users, farms, devices, sensor_readings
+
+spring.data.mongodb.uri=mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/?appName=APP_NAME
+spring.data.mongodb.database=agropulse
+spring.data.mongodb.auto-index-creation=true
+
+# Disable JPA/Hibernate when using MongoDB
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=false
+spring.jpa.open-in-view=false
+
+# Logging for debugging
+logging.level.org.springframework.data.mongodb=INFO
+logging.level.com.agropulse=INFO
+
+spring.jackson.serialization.write-dates-as-timestamps=false
+
+# JWT Configuration
+jwt.secret=YOUR_SECRET_KEY_HERE_MIN_32_CHARS
+jwt.expiration=86400000
+
+# Super Admin Configuration
+app.admin.username=admin
+app.admin.password=CHANGE_THIS_PASSWORD
+app.admin.email=admin@agropulse.com

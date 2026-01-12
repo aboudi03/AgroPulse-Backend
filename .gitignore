@@ -35,6 +35,7 @@ agropulse.trace.db
 .env
 .env.local
 .env.*.local
+application.properties
 application-local.properties
 application-dev.properties
 application-prod.properties
