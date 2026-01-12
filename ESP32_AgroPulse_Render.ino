@@ -20,6 +20,7 @@ const char* password = "Aboudisaleh123";
 // 🌐 Backend API (RENDER HTTPS)
 // =======================================================
 const char* BACKEND_URL = "https://agropulse-backend-mxio.onrender.com/api/sensor/add";
+const char* COMMAND_URL = "https://agropulse-backend-mxio.onrender.com/api/device/" DEVICE_ID "/command";
 
 // =======================================================
 // 🔌 Hardware Pins
@@ -28,6 +29,9 @@ const char* BACKEND_URL = "https://agropulse-backend-mxio.onrender.com/api/senso
 #define DHTPIN 4
 #define DHTTYPE DHT21
 DHT dht(DHTPIN, DHTTYPE);
+
+// Trigger Flag
+bool needsSendReading = false;
 
 // Trigger server
 WebServer server(80);
@@ -124,6 +128,30 @@ void sendReading() {
 }
 
 // =======================================================
+// 📥 Check for Commands (Polling)
+// =======================================================
+void checkForCommands() {
+  if (WiFi.status() != WL_CONNECTED) return;
+
+  WiFiClientSecure client;
+  client.setInsecure();
+  
+  HTTPClient http;
+  http.begin(client, COMMAND_URL);
+  
+  int code = http.GET();
+  if (code == 200) {
+    String payload = http.getString();
+    // Simple check for "UPDATE" command in JSON
+    if (payload.indexOf("UPDATE") > 0) {
+      Serial.println("📩 Command received: UPDATE -> Sending reading...");
+      sendReading();
+    }
+  }
+  http.end();
+}
+
+// =======================================================
 // 🔁 SERIAL COMMAND HANDLER
 // =======================================================
 void checkSerialCommands() {
@@ -144,10 +172,10 @@ void checkSerialCommands() {
 // =======================================================
 // 🔥 Trigger HTTP Endpoint (/trigger)
 // =======================================================
-void handleTrigger() {
   Serial.println("🔥 HTTP trigger received!");
-  sendReading();
-  server.send(200, "text/plain", "ESP32 triggered");
+  server.sendHeader("Connection", "close"); // Force browser to close connection
+  server.send(200, "text/plain", "Triggered! Data is being sent...");
+  needsSendReading = true; // Set flag to send in loop
 }
 
 // =======================================================
@@ -168,9 +196,9 @@ void setup() {
   Serial.println("🌐 HTTP Trigger Server running at:");
   Serial.println("    http://" + WiFi.localIP().toString() + "/trigger");
 
-  // Send initial reading once connected
+  // Send initial reading once connected (via flag to ensure non-blocking startup)
   Serial.println("\n🚀 Converting initial connection... sending first reading!");
-  sendReading();
+  needsSendReading = true;
 }
 
 // =======================================================
@@ -181,4 +209,24 @@ void loop() {
   checkSerialCommands();
   
   // ⏱ Auto-send removed. Only triggered via HTTP or Serial "send" command.
+  if (needsSendReading) {
+    // Small delay to ensure previous HTTP response is flushed
+    delay(500); 
+    needsSendReading = false;
+    sendReading();
+  }
+
+  // Heartbeat to prove loop is alive
+  static unsigned long lastBeat = 0;
+  if (millis() - lastBeat > 2000) {
+    Serial.print(".");
+    lastBeat = millis();
+  }
+
+  // 📥 Poll for commands every 5 seconds
+  static unsigned long lastPoll = 0;
+  if (millis() - lastPoll > 5000) {
+    checkForCommands();
+    lastPoll = millis();
+  }
 }

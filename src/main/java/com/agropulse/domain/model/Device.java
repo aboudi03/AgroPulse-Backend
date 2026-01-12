@@ -16,6 +16,8 @@ public class Device {
 
     private LocalDateTime lastSeen;
 
+    private boolean pendingUpdate = false;
+
     public Device() {
         this.lastSeen = LocalDateTime.now();
     }
@@ -60,5 +62,13 @@ public class Device {
 
     public void setFarmId(Long farmId) {
         this.farmId = farmId;
+    }
+
+    public boolean isPendingUpdate() {
+        return pendingUpdate;
+    }
+
+    public void setPendingUpdate(boolean pendingUpdate) {
+        this.pendingUpdate = pendingUpdate;
     }
 }

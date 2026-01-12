@@ -61,6 +61,36 @@ public class DeviceController {
         return ResponseEntity.ok(deviceDTOs);
     }
 
+    @PostMapping("/{deviceId}/trigger")
+    public ResponseEntity<Void> triggerDevice(@PathVariable String deviceId) {
+        Device device = deviceRepository.findById(deviceId).orElse(null);
+        if (device == null) {
+            return ResponseEntity.notFound().build();
+        }
+        device.setPendingUpdate(true);
+        deviceRepository.save(device);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{deviceId}/command")
+    public ResponseEntity<Map<String, String>> getDeviceCommand(@PathVariable String deviceId) {
+        Device device = deviceRepository.findById(deviceId).orElse(null);
+        if (device == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Map<String, String> response = new HashMap<>();
+        if (device.isPendingUpdate()) {
+            response.put("command", "UPDATE");
+            // Reset flag
+            device.setPendingUpdate(false);
+            deviceRepository.save(device);
+        } else {
+            response.put("command", "NONE");
+        }
+        return ResponseEntity.ok(response);
+    }
+
     // DTO for registration request
     public static class DeviceRegistrationRequest {
         private String deviceId;
