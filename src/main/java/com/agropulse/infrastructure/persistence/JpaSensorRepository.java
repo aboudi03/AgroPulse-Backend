@@ -1,17 +1,17 @@
 package com.agropulse.infrastructure.persistence;
 
 import com.agropulse.domain.model.SensorReading;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
+import java.util.Optional;
 
-public interface JpaSensorRepository extends JpaRepository<SensorReading, Long> {
+public interface JpaSensorRepository extends MongoRepository<SensorReading, Long> {
 
-    @Query("SELECT r FROM SensorReading r ORDER BY r.timestamp DESC LIMIT 1")
-    SensorReading findLatest();
+    Optional<SensorReading> findFirstByOrderByTimestampDesc();
 
     List<SensorReading> findByDeviceId(String deviceId);
 
-    @Query("SELECT r FROM SensorReading r WHERE r.deviceId = :deviceId ORDER BY r.timestamp DESC LIMIT 1")
-    SensorReading findLatestByDeviceId(String deviceId);
+    Optional<SensorReading> findFirstByDeviceIdOrderByTimestampDesc(String deviceId);
 }

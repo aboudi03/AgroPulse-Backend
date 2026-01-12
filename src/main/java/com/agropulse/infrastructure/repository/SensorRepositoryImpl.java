@@ -23,7 +23,7 @@ public class SensorRepositoryImpl implements SensorRepository {
 
     @Override
     public SensorReading findLatest() {
-        return jpa.findLatest();
+        return jpa.findFirstByOrderByTimestampDesc().orElse(null);
     }
 
     @Override
@@ -38,6 +38,6 @@ public class SensorRepositoryImpl implements SensorRepository {
 
     @Override
     public SensorReading findLatestByDeviceId(String deviceId) {
-        return jpa.findLatestByDeviceId(deviceId);
+        return jpa.findFirstByDeviceIdOrderByTimestampDesc(deviceId).orElse(null);
     }
 }

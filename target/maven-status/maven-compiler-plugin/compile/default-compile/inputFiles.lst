@@ -11,10 +11,12 @@ C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\co
 C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\domain\repository\UserRepository.java
 C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\config\CorsConfig.java
 C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\config\DataInitializer.java
+C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\persistence\DatabaseSequence.java
 C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\persistence\JpaDeviceRepository.java
 C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\persistence\JpaFarmRepository.java
 C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\persistence\JpaSensorRepository.java
 C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\persistence\JpaUserRepository.java
+C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\persistence\SequenceGenerator.java
 C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\repository\DeviceRepositoryImpl.java
 C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\repository\FarmRepositoryImpl.java
 C:\Users\aboud\Desktop\Neu\Projects\AgroPulse\Backend\AgroPulse\src\main\java\com\agropulse\infrastructure\repository\SensorRepositoryImpl.java

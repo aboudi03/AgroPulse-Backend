@@ -2,6 +2,7 @@ package com.agropulse.application.service;
 
 import com.agropulse.domain.model.User;
 import com.agropulse.domain.repository.UserRepository;
+import com.agropulse.infrastructure.persistence.SequenceGenerator;
 import com.agropulse.infrastructure.security.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,13 +16,15 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final SequenceGenerator sequenceGenerator;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-            JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
+            JwtUtil jwtUtil, AuthenticationManager authenticationManager, SequenceGenerator sequenceGenerator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
+        this.sequenceGenerator = sequenceGenerator;
     }
 
     public User register(String username, String password, String email, Long farmId, User.Role role) {
@@ -30,6 +33,7 @@ public class AuthService {
         }
 
         User user = new User();
+        user.setId(sequenceGenerator.getNextSequenceId("users"));
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);

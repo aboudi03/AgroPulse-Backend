@@ -7,6 +7,7 @@ com\agropulse\domain\repository\UserRepository.class
 com\agropulse\infrastructure\persistence\JpaFarmRepository.class
 com\agropulse\infrastructure\repository\DeviceRepositoryImpl.class
 com\agropulse\presentation\controller\AdminController$UserDTO.class
+com\agropulse\infrastructure\persistence\DatabaseSequence.class
 com\agropulse\infrastructure\util\IpAddressUtil.class
 com\agropulse\domain\model\SensorReading.class
 com\agropulse\presentation\controller\DeviceController$DeviceRegistrationRequest.class
@@ -43,3 +44,4 @@ com\agropulse\domain\repository\SensorRepository.class
 com\agropulse\infrastructure\repository\FarmRepositoryImpl.class
 com\agropulse\presentation\controller\AdminController$FarmDTO.class
 com\agropulse\presentation\controller\DeviceController$DeviceDTO.class
+com\agropulse\infrastructure\persistence\SequenceGenerator.class

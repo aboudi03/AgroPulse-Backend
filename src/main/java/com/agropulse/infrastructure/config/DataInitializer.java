@@ -5,6 +5,7 @@ import com.agropulse.domain.model.Farm;
 import com.agropulse.domain.model.User;
 import com.agropulse.domain.repository.FarmRepository;
 import com.agropulse.domain.repository.UserRepository;
+import com.agropulse.infrastructure.persistence.SequenceGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ public class DataInitializer implements CommandLineRunner {
     private final AuthService authService;
     private final FarmRepository farmRepository;
     private final UserRepository userRepository;
+    private final SequenceGenerator sequenceGenerator;
 
     @Value("${app.admin.username}")
     private String adminUsername;
@@ -25,10 +27,11 @@ public class DataInitializer implements CommandLineRunner {
     @Value("${app.admin.email}")
     private String adminEmail;
 
-    public DataInitializer(AuthService authService, FarmRepository farmRepository, UserRepository userRepository) {
+    public DataInitializer(AuthService authService, FarmRepository farmRepository, UserRepository userRepository, SequenceGenerator sequenceGenerator) {
         this.authService = authService;
         this.farmRepository = farmRepository;
         this.userRepository = userRepository;
+        this.sequenceGenerator = sequenceGenerator;
     }
 
     @Override
@@ -44,7 +47,9 @@ public class DataInitializer implements CommandLineRunner {
                         .findFirst()
                         .orElseGet(() -> {
                             System.out.println("Creating System Farm...");
-                            return farmRepository.save(new Farm("System Farm"));
+                            Farm newFarm = new Farm("System Farm");
+                            newFarm.setId(sequenceGenerator.getNextSequenceId("farms"));
+                            return farmRepository.save(newFarm);
                         });
 
                 // Create Admin User

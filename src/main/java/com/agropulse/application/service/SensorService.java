@@ -2,6 +2,7 @@ package com.agropulse.application.service;
 
 import com.agropulse.domain.repository.SensorRepository;
 import com.agropulse.domain.model.SensorReading;
+import com.agropulse.infrastructure.persistence.SequenceGenerator;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,14 +12,20 @@ import java.util.List;
 public class SensorService {
 
     private final SensorRepository repository;
+    private final SequenceGenerator sequenceGenerator;
 
-    public SensorService(SensorRepository repository) {
+    public SensorService(SensorRepository repository, SequenceGenerator sequenceGenerator) {
         this.repository = repository;
+        this.sequenceGenerator = sequenceGenerator;
     }
 
     public SensorReading saveReading(SensorReading reading) {
         if (reading.getDeviceId() == null || reading.getDeviceId().isEmpty()) {
             throw new IllegalArgumentException("Device ID is required");
+        }
+
+        if (reading.getId() == null) {
+            reading.setId(sequenceGenerator.getNextSequenceId("sensor_readings"));
         }
 
         if (reading.getTimestamp() == null) {

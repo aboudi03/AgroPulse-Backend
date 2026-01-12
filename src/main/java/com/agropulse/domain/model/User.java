@@ -1,28 +1,23 @@
 package com.agropulse.domain.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "users")
+@Document(collection = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(nullable = false)
     private String password; // BCrypt hashed
 
     private String email;
 
-    @Column(name = "farm_id")
     private Long farmId;
 
-    @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
     private LocalDateTime createdAt;
@@ -39,7 +34,6 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
-    @PrePersist
     public void setCreatedAtOnCreate() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();

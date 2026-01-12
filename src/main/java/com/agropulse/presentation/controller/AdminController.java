@@ -7,6 +7,7 @@ import com.agropulse.domain.model.User;
 import com.agropulse.domain.repository.DeviceRepository;
 import com.agropulse.domain.repository.FarmRepository;
 import com.agropulse.domain.repository.UserRepository;
+import com.agropulse.infrastructure.persistence.SequenceGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,13 +26,15 @@ public class AdminController {
     private final UserRepository userRepository;
     private final DeviceRepository deviceRepository;
     private final AuthService authService;
+    private final SequenceGenerator sequenceGenerator;
 
     public AdminController(FarmRepository farmRepository, UserRepository userRepository,
-            DeviceRepository deviceRepository, AuthService authService) {
+            DeviceRepository deviceRepository, AuthService authService, SequenceGenerator sequenceGenerator) {
         this.farmRepository = farmRepository;
         this.userRepository = userRepository;
         this.deviceRepository = deviceRepository;
         this.authService = authService;
+        this.sequenceGenerator = sequenceGenerator;
     }
 
     // ==================== FARM MANAGEMENT ====================
@@ -41,6 +44,7 @@ public class AdminController {
         Map<String, Object> response = new HashMap<>();
 
         Farm farm = new Farm(request.getName());
+        farm.setId(sequenceGenerator.getNextSequenceId("farms"));
         Farm saved = farmRepository.save(farm);
 
         response.put("message", "Farm created successfully");

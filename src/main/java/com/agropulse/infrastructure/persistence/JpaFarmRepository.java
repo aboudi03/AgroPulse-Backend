@@ -1,7 +1,7 @@
 package com.agropulse.infrastructure.persistence;
 
 import com.agropulse.domain.model.Farm;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface JpaFarmRepository extends JpaRepository<Farm, Long> {
+public interface JpaFarmRepository extends MongoRepository<Farm, Long> {
 }
