@@ -1,27 +1,33 @@
+version: '3.8'
+
 services:
+  # Backend API (Spring Boot with MongoDB)
   backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agropulse-backend
     ports:
       - "8080:8080"
-    depends_on:
-      - db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/agropulse
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      # MongoDB Atlas Connection (set these via .env file)
+      - SPRING_DATA_MONGODB_URI=${MONGODB_URI:-mongodb+srv://user:password@cluster.mongodb.net/?appName=AgroPulseCluster}
+      - SPRING_DATA_MONGODB_DATABASE=agropulse
+      - JWT_SECRET=${JWT_SECRET:-nL7h1PpVb8oY1wTbOeD9z93k0u8rW5xFh3p2sUdQy6M=}
+      - JWT_EXPIRATION=86400000
+      - APP_ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - APP_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - APP_ADMIN_EMAIL=${ADMIN_EMAIL:-admin@agropulse.com}
+    restart: unless-stopped
+    networks:
+      - agropulse-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/auth/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
-  db:
-    image: postgres:15-alpine
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=agropulse
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
+networks:
+  agropulse-network:
+    driver: bridge
