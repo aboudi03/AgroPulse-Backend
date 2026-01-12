@@ -16,11 +16,8 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // Allow requests from your frontend
-        config.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000", // React/Vue/Angular dev server
-                "http://localhost:5173", // Vite dev server
-                "http://localhost:4200" // Angular dev server
-        ));
+        // Allow requests from ANY frontend (including localhost and production)
+        config.setAllowedOriginPatterns(Arrays.asList("*"));
 
         // Allow all HTTP methods
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
