@@ -140,13 +140,17 @@ void checkForCommands() {
   http.begin(client, COMMAND_URL);
   
   int code = http.GET();
-  if (code == 200) {
+  if (code > 0) {
     String payload = http.getString();
+    Serial.printf("📥 Cmd poll: %d, Payload: %s\n", code, payload.c_str());
+    
     // Simple check for "UPDATE" command in JSON
-    if (payload.indexOf("UPDATE") > 0) {
+    if (code == 200 && payload.indexOf("UPDATE") > 0) {
       Serial.println("📩 Command received: UPDATE -> Sending reading...");
       sendReading();
     }
+  } else {
+    Serial.printf("❌ Cmd poll failed: %s\n", http.errorToString(code).c_str());
   }
   http.end();
 }
