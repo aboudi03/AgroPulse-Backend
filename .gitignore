@@ -23,3 +23,67 @@ target/
 
 ### Logs ###
 *.log
+logs/
+
+### Database Files ###
+*.db
+*.mv.db
+agropulse.mv.db
+agropulse.trace.db
+
+### Environment Variables ###
+.env
+.env.local
+.env.*.local
+application-local.properties
+application-dev.properties
+application-prod.properties
+
+### Spring Boot ###
+/build/
+.gradle
+*.springBeans
+.sts4-cache/
+
+### Maven ###
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+.mvn/timing.properties
+
+### Compiled files ###
+*.class
+*.jar
+*.war
+*.ear
+
+### OS ###
+Thumbs.db
+.DS_Store
+
+### Temporary files ###
+*.tmp
+*.bak
+*.swp
+*~
+
+### Node (if applicable) ###
+node_modules/
+npm-debug.log*
+
+### Security - Never commit ###
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+.npmrc
+.m2/
+
+### IDE Misc ###
+out/
+dist/
+bin/
